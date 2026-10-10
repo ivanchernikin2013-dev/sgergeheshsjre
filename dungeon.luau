@@ -1,2 +1,313 @@
---[[ Made with love, https://bobloscript.com/obfuscator ]]
-local b=game:GetService("Players")local T=game:GetService("RunService")local y=b.LocalPlayer local j=(loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua")))()local P="https://raw.githubusercontent.com/ivanchernikin2013-dev/sgergeheshsjre/main/av.jpeg"local u="av_custom.jpeg"if not isfile(u)then writefile(u,game:HttpGet(P))end local B=getcustomasset(u)local z={AbilityEnabled=false}local R=false local S=false local function q(b)if not b or not b:IsA("Tool")then return false end if b:FindFirstChild("localEvent")then return true end if b:FindFirstChild("abilityType")then return true end if b:FindFirstChild("cooldown")and b:FindFirstChild("cooldownLength")then return true end return false end local function d(b)if not b then return nil end local T=b:FindFirstChild("cooldown")if T and T:IsA("NumberValue")then return T.Value end local y=b:FindFirstChild("cooldownTime")if y and y:IsA("NumberValue")then return y.Value end local j=b:FindFirstChild("Cooldown")if j and j:IsA("NumberValue")then return j.Value end return nil end local function e()local b,T={},{}local j=y:FindFirstChild("Backpack")if j then for y,j in ipairs(j:GetChildren())do if q(j)and not T[j]then T[j]=true table.insert(b,j)end end end local P=y.Character if P then local y=P:FindFirstChildOfClass("Tool")if y and(q(y)and not T[y])then T[y]=true table.insert(b,y)end end return b end local function J(b)local T=y.Character if not T or not b then return end if b.Parent==T then return end b.Parent=T end local function N()local b=y.Character if not b then return true end local T=b:FindFirstChild("busyCasting")if T and T:IsA("BoolValue")then return T.Value==true end return false end local function X(b)J(b)local T=b:FindFirstChild("abilityEvent")if T and T:IsA("RemoteEvent")then pcall(function()T:FireServer()end)end for T,y in ipairs({"spellEvent","fireballShootEvent"})do local j=b:FindFirstChild(y)if j and j:IsA("RemoteEvent")then pcall(function()j:FireServer()end)end end local y=b:FindFirstChild("localEvent")if y and y:IsA("BindableEvent")then pcall(function()y:Fire()end)end end local f=0 local H={}local Z=.7 local t=2 local function L()if S then return false end if not z.AbilityEnabled then return false end local b=tick()if b-f<Z then return false end if N()then return false end local T=e()if#T==0 then return false end for T,j in ipairs(T)do local P=j.Parent==y.Character or j.Parent==y.Backpack if P then local T=d(j)local y=H[j]or 0 local P=b-y local u=false if T~=nil then u=(T<=0)and(P>=.5)else u=(P>=t)end if u then H[j]=b f=b X(j)return true end end end return false end local function g()if R or S then return end if not z.AbilityEnabled then return end S=true task.spawn(function()while z.AbilityEnabled and not R do local b=e()if#b>=1 then while N()do task.wait(.1)end X(b[1])H[b[1]]=tick()f=tick()task.wait(2.5)if not z.AbilityEnabled then S=false return end if#b>=2 then while N()do task.wait(.1)end X(b[2])H[b[2]]=tick()f=tick()end R=true break end task.wait(.2)end S=false end)end T.Heartbeat:Connect(function(b)if not z.AbilityEnabled then return end local T=y.Character if not T then return end local j=T:FindFirstChildOfClass("Humanoid")if not j or j.Health<=0 then return end if S then return end L()end)local m=j:CreateWindow({Title="Auto Abilities",SubTitle="Auto ability caster";Icon="sword",Author="@Roblocor";Folder="AutoAbilities",Size=UDim2.fromOffset(650,450);Transparent=true,Theme="Dark",User={Enabled=true;Anonymous=false}})local function k()local b={game:GetService("CoreGui")}local T,y=pcall(gethui)if T and y then table.insert(b,y)end return b end local function G(b)if not b:IsA("ImageLabel")then return end local T=b.Image or""local y=string.lower(T)local j=y:find("rbxthumb",1,true)or y:find("headshot",1,true)or y:find("avatar",1,true)or y:find("av_custom",1,true)if j and b.Image~=B then pcall(function()b.Image=B b.ImageRectOffset=Vector2.zero b.ImageRectSize=Vector2.zero b.ScaleType=Enum.ScaleType.Crop b.ResampleMode=Enum.ResamplerMode.Default b.ImageTransparency=0 b.ImageColor3=Color3.fromRGB(255,255,255)for T,y in ipairs(b:GetChildren())do if y:IsA("UIGradient")then y:Destroy()end if y:IsA("ImageLabel")and y~=b then y.ImageTransparency=1 end end end)end end local function M(b)if not b:IsA("ImageLabel")then return end local T=b.Parent if not T or not T:IsA("Frame")then return end local y=T.Parent if not y or not y:IsA("TextButton")then return end local j=T.AbsoluteSize if j.X>0 and(j.Y>0 and(math.abs(j.X-j.Y)<6 and j.X<30))then pcall(function()b.ImageTransparency=1 for T,y in ipairs(T:GetChildren())do if y:IsA("Frame")then y.BackgroundTransparency=1 end if y:IsA("ImageLabel")and y~=b then y.ImageTransparency=1 end end end)end end task.spawn(function()for b=1,8,1 do task.wait(.5)for b,T in ipairs(k())do for b,T in ipairs(T:GetDescendants())do G(T)M(T)end end end end)local function W(b)b.DescendantAdded:Connect(function(b)task.defer(function()G(b)M(b)end)end)end for b,T in ipairs(k())do pcall(W,T)end local i=m:Tab({Title="Abilities",Icon="zap"})local A=i:Section({Title="Ability Settings",Opened=true})A:Toggle({Title="Auto Use Abilities",Desc="Automatically use abilities when available";Icon="";Default=false,Callback=function(b)z.AbilityEnabled=b if b then H={}R=false S=false g()else R=false S=false end end})m:OnClose(function()z.AbilityEnabled=false R=false S=false end)y.CharacterAdded:Connect(function(b)task.wait(.5)H={}R=false S=false if z.AbilityEnabled then g()end end)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local url = "https://raw.githubusercontent.com/ivanchernikin2013-dev/sgergeheshsjre/main/av.jpeg"
+local fileName = "av_custom.jpeg"
+if not isfile(fileName) then
+    writefile(fileName, game:HttpGet(url))
+end
+local AvatarToUse = getcustomasset(fileName)
+
+local settings = { AbilityEnabled = false }
+local firstCastDone = false
+local inFirstCast = false
+
+local function isAbilityTool(item)
+    if not item or not item:IsA("Tool") then return false end
+    if item:FindFirstChild("localEvent") then return true end
+    if item:FindFirstChild("abilityType") then return true end
+    if item:FindFirstChild("cooldown") and item:FindFirstChild("cooldownLength") then return true end
+    return false
+end
+
+local function getAbilityCooldown(tool)
+    if not tool then return nil end
+    local cd = tool:FindFirstChild("cooldown")
+    if cd and cd:IsA("NumberValue") then return cd.Value end
+    local cd2 = tool:FindFirstChild("cooldownTime")
+    if cd2 and cd2:IsA("NumberValue") then return cd2.Value end
+    local cd3 = tool:FindFirstChild("Cooldown")
+    if cd3 and cd3:IsA("NumberValue") then return cd3.Value end
+    return nil
+end
+
+local function getAllAbilities()
+    local list, seen = {}, {}
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    if backpack then
+        for _, item in ipairs(backpack:GetChildren()) do
+            if isAbilityTool(item) and not seen[item] then
+                seen[item] = true
+                table.insert(list, item)
+            end
+        end
+    end
+    local char = LocalPlayer.Character
+    if char then
+        local eq = char:FindFirstChildOfClass("Tool")
+        if eq and isAbilityTool(eq) and not seen[eq] then
+            seen[eq] = true
+            table.insert(list, eq)
+        end
+    end
+    return list
+end
+
+local function equipTool(tool)
+    local char = LocalPlayer.Character
+    if not char or not tool then return end
+    if tool.Parent == char then return end
+    tool.Parent = char
+end
+
+local function isBusy()
+    local char = LocalPlayer.Character
+    if not char then return true end
+    local bc = char:FindFirstChild("busyCasting")
+    if bc and bc:IsA("BoolValue") then return bc.Value == true end
+    return false
+end
+
+local function fireAbility(ability)
+    equipTool(ability)
+    local ev = ability:FindFirstChild("abilityEvent")
+    if ev and ev:IsA("RemoteEvent") then pcall(function() ev:FireServer() end) end
+    for _, rn in ipairs({ "spellEvent", "fireballShootEvent" }) do
+        local r = ability:FindFirstChild(rn)
+        if r and r:IsA("RemoteEvent") then pcall(function() r:FireServer() end) end
+    end
+    local localEvent = ability:FindFirstChild("localEvent")
+    if localEvent and localEvent:IsA("BindableEvent") then
+        pcall(function() localEvent:Fire() end)
+    end
+end
+
+local lastAbilityFire = 0
+local abilityLastUse = {}
+local ABILITY_MIN_INTERVAL = 0.7
+local ABILITY_FALLBACK_CD = 2.0
+
+local function doAbility()
+    if inFirstCast then return false end
+    if not settings.AbilityEnabled then return false end
+    local now = tick()
+    if now - lastAbilityFire < ABILITY_MIN_INTERVAL then return false end
+    if isBusy() then return false end
+    local abilities = getAllAbilities()
+    if #abilities == 0 then return false end
+    for _, ability in ipairs(abilities) do
+        local owner = ability.Parent == LocalPlayer.Character or ability.Parent == LocalPlayer.Backpack
+        if owner then
+            local cd = getAbilityCooldown(ability)
+            local lastUse = abilityLastUse[ability] or 0
+            local sinceUse = now - lastUse
+            local ready = false
+            if cd ~= nil then
+                ready = (cd <= 0) and (sinceUse >= 0.5)
+            else
+                ready = (sinceUse >= ABILITY_FALLBACK_CD)
+            end
+            if ready then
+                abilityLastUse[ability] = now
+                lastAbilityFire = now
+                fireAbility(ability)
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function runFirstCast()
+    if firstCastDone or inFirstCast then return end
+    if not settings.AbilityEnabled then return end
+    inFirstCast = true
+    task.spawn(function()
+        while settings.AbilityEnabled and not firstCastDone do
+            local abilities = getAllAbilities()
+            if #abilities >= 1 then
+                while isBusy() do task.wait(0.1) end
+                fireAbility(abilities[1])
+                abilityLastUse[abilities[1]] = tick()
+                lastAbilityFire = tick()
+                task.wait(2.5)
+                if not settings.AbilityEnabled then
+                    inFirstCast = false
+                    return
+                end
+                if #abilities >= 2 then
+                    while isBusy() do task.wait(0.1) end
+                    fireAbility(abilities[2])
+                    abilityLastUse[abilities[2]] = tick()
+                    lastAbilityFire = tick()
+                end
+                firstCastDone = true
+                break
+            end
+            task.wait(0.2)
+        end
+        inFirstCast = false
+    end)
+end
+
+RunService.Heartbeat:Connect(function(dt)
+    if not settings.AbilityEnabled then return end
+    local char = LocalPlayer.Character
+    if not char then return end
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then return end
+    if inFirstCast then return end
+    doAbility()
+end)
+
+local Window = WindUI:CreateWindow({
+    Title = "Auto Abilities",
+    SubTitle = "Auto ability caster",
+    Icon = "sword",
+    Author = "@Roblocor",
+    Folder = "AutoAbilities",
+    Size = UDim2.fromOffset(650, 450),
+    Transparent = true,
+    Theme = "Dark",
+    User = {
+        Enabled = true,
+        Anonymous = false,
+    },
+})
+
+-- ============================================================
+-- Оптимизированная замена аватарки + чистка тумблеров
+-- ============================================================
+local function getContainers()
+    local list = { game:GetService("CoreGui") }
+    local ok, hui = pcall(gethui)
+    if ok and hui then table.insert(list, hui) end
+    return list
+end
+
+local function applyAvatar(d)
+    if not d:IsA("ImageLabel") then return end
+    local img = d.Image or ""
+    local low = string.lower(img)
+    local isAvatarLike = low:find("rbxthumb", 1, true)
+        or low:find("headshot", 1, true)
+        or low:find("avatar", 1, true)
+        or low:find("av_custom", 1, true)
+    if isAvatarLike and d.Image ~= AvatarToUse then
+        pcall(function()
+            d.Image = AvatarToUse
+            d.ImageRectOffset = Vector2.zero
+            d.ImageRectSize = Vector2.zero
+            d.ScaleType = Enum.ScaleType.Crop
+            d.ResampleMode = Enum.ResamplerMode.Default
+            d.ImageTransparency = 0
+            d.ImageColor3 = Color3.fromRGB(255, 255, 255)
+            for _, c in ipairs(d:GetChildren()) do
+                if c:IsA("UIGradient") then c:Destroy() end
+                if c:IsA("ImageLabel") and c ~= d then
+                    c.ImageTransparency = 1
+                end
+            end
+        end)
+    end
+end
+
+local function cleanToggleKnob(d)
+    if not d:IsA("ImageLabel") then return end
+    local parent = d.Parent
+    if not parent or not parent:IsA("Frame") then return end
+    local gp = parent.Parent
+    if not gp or not gp:IsA("TextButton") then return end
+    local size = parent.AbsoluteSize
+    if size.X > 0 and size.Y > 0 and math.abs(size.X - size.Y) < 6 and size.X < 30 then
+        pcall(function()
+            d.ImageTransparency = 1
+            for _, child in ipairs(parent:GetChildren()) do
+                if child:IsA("Frame") then
+                    child.BackgroundTransparency = 1
+                end
+                if child:IsA("ImageLabel") and child ~= d then
+                    child.ImageTransparency = 1
+                end
+            end
+        end)
+    end
+end
+
+-- Первичный проход: несколько раз за первые 4 секунды
+task.spawn(function()
+    for _ = 1, 8 do
+        task.wait(0.5)
+        for _, c in ipairs(getContainers()) do
+            for _, d in ipairs(c:GetDescendants()) do
+                applyAvatar(d)
+                cleanToggleKnob(d)
+            end
+        end
+    end
+end)
+
+-- Подписка на новые элементы (вместо бесконечного цикла)
+local function hookContainer(c)
+    c.DescendantAdded:Connect(function(d)
+        task.defer(function()
+            applyAvatar(d)
+            cleanToggleKnob(d)
+        end)
+    end)
+end
+
+for _, c in ipairs(getContainers()) do
+    pcall(hookContainer, c)
+end
+
+-- ============================================================
+
+local MainTab = Window:Tab({
+    Title = "Abilities",
+    Icon = "zap",
+})
+
+local AbilitySection = MainTab:Section({
+    Title = "Ability Settings",
+    Opened = true,
+})
+
+AbilitySection:Toggle({
+    Title = "Auto Use Abilities",
+    Desc = "Automatically use abilities when available",
+    Icon = "",
+    Default = false,
+    Callback = function(state)
+        settings.AbilityEnabled = state
+        if state then
+            abilityLastUse = {}
+            firstCastDone = false
+            inFirstCast = false
+            runFirstCast()
+        else
+            firstCastDone = false
+            inFirstCast = false
+        end
+    end,
+})
+
+Window:OnClose(function()
+    settings.AbilityEnabled = false
+    firstCastDone = false
+    inFirstCast = false
+end)
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+    task.wait(0.5)
+    abilityLastUse = {}
+    firstCastDone = false
+    inFirstCast = false
+    if settings.AbilityEnabled then
+        runFirstCast()
+    end
+end)
